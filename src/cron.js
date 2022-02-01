@@ -32,7 +32,6 @@ async function getNotificationMessage(notifications) {
 }
 
 cron.schedule("0,5,10,15,20,25,30,35,40,45,50,55 * * * *", async () => {
-  console.log("Cron Status: Started => 5 Dakika");
   const notifications = await NotificationService.get5MinuteNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
@@ -47,7 +46,6 @@ cron.schedule("0,5,10,15,20,25,30,35,40,45,50,55 * * * *", async () => {
 });
 
 cron.schedule("0,10,20,30,40,50 * * * *", async () => {
-  console.log("Cron Status: Started => 10 Dakika");
   const notifications = await NotificationService.get10MinuteNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
@@ -62,7 +60,6 @@ cron.schedule("0,10,20,30,40,50 * * * *", async () => {
 });
 
 cron.schedule("0,30 * * * *", async () => {
-  console.log("Cron Status: Started => 30 Dakika");
   const notifications = await NotificationService.get30MinuteNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
@@ -77,7 +74,6 @@ cron.schedule("0,30 * * * *", async () => {
 });
 
 cron.schedule("0 * * * *", async () => {
-  console.log("Cron Status: Started => 1 Saat");
   const notifications = await NotificationService.get1HourNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
@@ -92,7 +88,6 @@ cron.schedule("0 * * * *", async () => {
 });
 
 cron.schedule("0 0,6,12,18 * * *", async () => {
-  console.log("Cron Status: Started => 4 Saat");
   const notifications = await NotificationService.get6HourNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
@@ -107,7 +102,6 @@ cron.schedule("0 0,6,12,18 * * *", async () => {
 });
 
 cron.schedule("0 0,12 * * *", async () => {
-  console.log("Cron Status: Started => 12 Saat");
   const notifications = await NotificationService.get12HourNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
@@ -122,7 +116,6 @@ cron.schedule("0 0,12 * * *", async () => {
 });
 
 cron.schedule("0 0 * * *", async () => {
-  console.log("Cron Status: Started => 1 Gün");
   const notifications = await NotificationService.get1DayNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
