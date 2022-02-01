@@ -2,6 +2,8 @@
 
 Telegram'da belirlediğiniz dakika, saat ve gün aralığında size istediğiniz para ve kripto para biriminin anlık fiyatını mesaj olarak gönderiyor.
 
+[Telegram Bot Link](https://t.me/CryptoCurrency_NotificationBot)
+
 ## Bilgisayarınızda Çalıştırın
 
 Projeyi klonlayın
