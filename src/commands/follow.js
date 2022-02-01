@@ -151,35 +151,41 @@ TelegramService.on("callback_query", async (callbackQuery) => {
       },
     });
   } else if (callBackDataType === "TIME") {
-    let message = "";
-    const { price, cpd } = await CurrencyService.getCurrency(
+    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrency(
       callBackDataCurrency
     );
+    let message = "";
 
     if (callBackDataTimeUnit === "MINUTE") {
-      message = `You will receive a notifications every ${notificationTime} minutes.
-
-<b>${callBackDataCurrency}:</b> ${price} ${
-        cpd ? (cpd >= 0 ? `<b>↑ ${cpd}%</b>` : `<b>↓ ${cpd}%</b>`) : ""
-      }`;
+      message = `You will receive a notifications every ${notificationTime} minutes.\n\n`;
     } else if (callBackDataTimeUnit === "HOUR" && notificationTime === "1") {
-      message = `You will receive a notifications every ${notificationTime} hour.
-      
-<b>${callBackDataCurrency}:</b> ${price} ${
-        cpd ? (cpd >= 0 ? `<b>↑ ${cpd}%</b>` : `<b>↓ ${cpd}%</b>`) : ""
-      }`;
+      message = `You will receive a notifications every ${notificationTime} hour.\n\n`;
     } else if (callBackDataTimeUnit === "HOUR") {
-      message = `You will receive a notifications every ${notificationTime} hours.
-
-<b>${callBackDataCurrency}:</b> ${price} ${
-        cpd ? (cpd >= 0 ? `<b>↑ ${cpd}%</b>` : `<b>↓ ${cpd}%</b>`) : ""
-      }`;
+      message = `You will receive a notifications every ${notificationTime} hours.\n\n`;
     } else if (callBackDataTimeUnit === "DAY") {
-      message = `You will receive a notification once a day.
+      message = `You will receive a notification once a day.\n\n`;
+    }
 
-<b>${callBackDataCurrency}:</b> ${price} ${
-        cpd ? (cpd >= 0 ? `<b>↑ ${cpd}%</b>` : `<b>↓ ${cpd}%</b>`) : ""
-      }`;
+    message += `<b>${callBackDataCurrency}:</b> ${price}\n\n`;
+
+    if (cpd) {
+      if (cpd >= 0) {
+        message += `Daily Change: <b>↑ +${cpd}%</b>\n`;
+      } else {
+        message += `Daily Change: <b>↓ ${cpd}%</b>\n`;
+      }
+
+      if (cpw >= 0) {
+        message += `Weekly Change: <b>↑ +${cpw}%</b>\n`;
+      } else {
+        message += `Weekly Change: <b>↓ ${cpw}%</b>\n`;
+      }
+
+      if (cpm >= 0) {
+        message += `Monthly Change: <b>↑ +${cpm}%</b>`;
+      } else {
+        message += `Monthly Change: <b>↓ ${cpm}%</b>`;
+      }
     }
 
     await TelegramService.editMessageText(chatId, messageId, message, {

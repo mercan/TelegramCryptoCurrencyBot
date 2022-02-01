@@ -35,7 +35,11 @@ class RabbitMQService {
         );
         this.channel.ack(msg);
       } catch (error) {
-        console.error("Send Message Error:", error);
+        console.error("Send Message Error:", {
+          error_code: error.response.body.error_code,
+          description: error.response.body.description,
+          timestamp: Date.now(),
+        });
 
         if (error.response.body.error_code === 403) {
           await NotificationService.deleteUser(chatId);

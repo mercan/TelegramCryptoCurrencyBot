@@ -13,16 +13,35 @@ async function getNotificationMessage(notifications) {
       const response = await CurrencyService.getCurrency(currencyName);
 
       currency[currencyName] = {
+        ...response,
         price: response.lp ? response.lp : response.price,
-        cpd: response.cpd,
       };
     }
 
-    const { price, cpd } = currency[currencyName];
+    const { price, cpd, cpw, cpm } = currency[currencyName];
+    let message = `
+    ​
+<b>${currencyName}:</b> ${price}\n\n`;
 
-    const message = `<b>${currencyName}:</b> ${price} ${
-      cpd ? (cpd >= 0 ? `<b>↑ ${cpd}%</b>` : `<b>↓ ${cpd}%</b>`) : ""
-    }`;
+    if (cpd) {
+      if (cpd >= 0) {
+        message += `Daily Change: <b>↑ +${cpd}%</b>\n`;
+      } else {
+        message += `Daily Change: <b>↓ ${cpd}%</b>\n`;
+      }
+
+      if (cpw >= 0) {
+        message += `Weekly Change: <b>↑ +${cpw}%</b>\n`;
+      } else {
+        message += `Weekly Change: <b>↓ ${cpw}%</b>\n`;
+      }
+
+      if (cpm >= 0) {
+        message += `Monthly Change: <b>↑ +${cpm}%</b>`;
+      } else {
+        message += `Monthly Change: <b>↓ ${cpm}%</b>`;
+      }
+    }
 
     return {
       chatId,
@@ -45,7 +64,8 @@ cron.schedule("0,5,10,15,20,25,30,35,40,45,50,55 * * * *", async () => {
   });
 });
 
-cron.schedule("0,10,20,30,40,50 * * * *", async () => {
+// 0,10,20,30,40,50 * * * *
+cron.schedule("* * * * *", async () => {
   const notifications = await NotificationService.get10MinuteNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)

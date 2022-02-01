@@ -109,12 +109,30 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   }
 
   if (callBackDataType === "PRICE") {
-    const { price, cpd } = await CurrencyService.getCurrency(
+    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrency(
       callBackDataCurrency
     );
-    const message = `<b>${callBackDataCurrency}:</b> ${price} ${
-      cpd ? (cpd >= 0 ? `<b>↑ ${cpd}%</b>` : `<b>↓ ${cpd}%</b>`) : ""
-    }`;
+    let message = `<b>${callBackDataCurrency}:</b> ${price}\n\n`;
+
+    if (cpd) {
+      if (cpd >= 0) {
+        message += `Daily Change: <b>↑ +${cpd}%</b>\n`;
+      } else {
+        message += `Daily Change: <b>↓ ${cpd}%</b>\n`;
+      }
+
+      if (cpw >= 0) {
+        message += `Weekly Change: <b>↑ +${cpw}%</b>\n`;
+      } else {
+        message += `Weekly Change: <b>↓ ${cpw}%</b>\n`;
+      }
+
+      if (cpm >= 0) {
+        message += `Monthly Change: <b>↑ +${cpm}%</b>`;
+      } else {
+        message += `Monthly Change: <b>↓ ${cpm}%</b>`;
+      }
+    }
 
     await TelegramService.editMessageText(chatId, messageId, message, {
       parse_mode: "HTML",

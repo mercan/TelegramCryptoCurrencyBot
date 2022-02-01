@@ -16,7 +16,7 @@ class CurrencyService {
       );
 
       const data = await response.json();
-      data.price = data.lp.toFixed(5);
+      data.price = data.lp.toFixed(4);
 
       return data;
     } catch {
@@ -31,7 +31,7 @@ class CurrencyService {
       );
 
       const data = await response.json();
-      data.price = data.price.toFixed(5);
+      data.price = data.price.toFixed(4);
 
       return data;
     }
