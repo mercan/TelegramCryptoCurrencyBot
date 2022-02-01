@@ -64,8 +64,7 @@ cron.schedule("0,5,10,15,20,25,30,35,40,45,50,55 * * * *", async () => {
   });
 });
 
-// 0,10,20,30,40,50 * * * *
-cron.schedule("* * * * *", async () => {
+cron.schedule("0,10,20,30,40,50 * * * *", async () => {
   const notifications = await NotificationService.get10MinuteNotifications();
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
