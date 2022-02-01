@@ -1,0 +1,20 @@
+// Services
+const TelegramService = require("../services/TelegramService");
+const NotificationService = require("../services/NotificationService");
+
+TelegramService.onText(/^\/cancelall$/g, async (msg) => {
+  const chatId = msg.chat.id;
+  const message = "All your subscriptions have been canceled!";
+  const currencies = await NotificationService.getSubscriber(chatId);
+  const currenciesList = currencies.map((subscriber) => {
+    return subscriber.currency;
+  });
+
+  currenciesList.forEach(async (currency) => {
+    // Cancel Subscriber
+    await NotificationService.cancelSubscriber(chatId, currency);
+  });
+
+  // Send Message
+  await TelegramService.sendMessage(chatId, message);
+});

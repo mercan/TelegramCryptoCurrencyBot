@@ -1,0 +1,18 @@
+{
+  "name": "telegramdovizbot",
+  "version": "1.0.0",
+  "main": ".src/index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "start:dev": "nodemon ./src/index.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "dotenv": "^14.3.2",
+    "mongoose": "^6.1.8",
+    "node-cron": "^3.0.0",
+    "node-fetch": "^2.6.7",
+    "node-telegram-bot-api": "^0.56.0"
+  }
+}
