@@ -4,6 +4,8 @@ Telegram'da belirlediğiniz dakika, saat ve gün aralığında size istediğiniz
 
 [Telegram Bot Link](https://t.me/CryptoCurrency_NotificationBot)
 
+[![CodeFactor](https://www.codefactor.io/repository/github/mercan/telegramcryptocurrencybot/badge)](https://www.codefactor.io/repository/github/mercan/telegramcryptocurrencybot)
+
 ## Bilgisayarınızda Çalıştırın
 
 Projeyi klonlayın
