@@ -45,7 +45,7 @@ Bu projeyi çalıştırmak için aşağıdaki ortam değişkenlerini .env dosyan
 
 ## Kullanılan Teknolojiler
 
-**Sunucu:** Node, MongoDB, RabbitMQ
+**Sunucu:** Docker, Node, MongoDB, RabbitMQ
 
 ## Sponsor
 
