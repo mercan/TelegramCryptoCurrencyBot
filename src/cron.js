@@ -10,7 +10,7 @@ async function getNotificationMessage(notifications) {
     const { currency: currencyName, chatId } = notification;
 
     if (!currency[currencyName]) {
-      const response = await CurrencyService.getPrice(currencyName);
+      const response = await CurrencyService.getPriceCrypto(currencyName);
 
       currency[currencyName] = {
         ...response,

@@ -113,7 +113,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   }
 
   if (callBackDataType === "PRICE") {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getPrice(
+    const { price, cpd, cpw, cpm } = await CurrencyService.getPriceCrypto(
       callBackDataCurrency
     );
     let message = `<b>${callBackDataCurrency}:</b> ${price}\n\n`;

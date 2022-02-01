@@ -1,7 +1,7 @@
 require("./start");
 require("./follow");
 require("./price");
-require("./pricelist");
+require("./currentStatus");
 require("./subscriptions");
 require("./cancel");
 require("./cancelAll");

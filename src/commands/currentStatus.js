@@ -3,7 +3,7 @@ const CurrencyService = require("../services/CurrencyService");
 const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
 
-TelegramService.onText(/^\/pricelist$/g, async (msg) => {
+TelegramService.onText(/^\/currentStatus$/g, async (msg) => {
   const chatId = msg.chat.id;
   const currencies = await NotificationService.getSubscriber(chatId);
 
@@ -17,7 +17,9 @@ TelegramService.onText(/^\/pricelist$/g, async (msg) => {
   let message = "";
 
   for await (const { currency } of currencies) {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getPrice(currency);
+    const { price, cpd, cpw, cpm } = await CurrencyService.getPriceCrypto(
+      currency
+    );
     message += `<b>${currency}:</b> ${price}\n\n`;
 
     if (cpd) {
