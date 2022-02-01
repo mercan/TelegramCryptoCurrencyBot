@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const { FINAGE } = require("../config/index");
 
 class CurrencyService {
-  async getCurrency(currency) {
+  async getPrice(currency) {
     try {
       const response = await fetch(
         `https://api.finage.co.uk/last/crypto/changes/${currency}?apikey=${FINAGE.API_KEY}`,

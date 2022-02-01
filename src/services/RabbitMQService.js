@@ -31,7 +31,9 @@ class RabbitMQService {
         });
 
         console.log(
-          `LOG: Message sent to ${chatId} successfully with text: ${messageText} - ${Date.now()}`
+          `LOG: Message sent to ${chatId} successfully with text: ${messageText
+            .trim()
+            .replace(/\n/g, "")} - ${Date.now()}`
         );
         this.channel.ack(msg);
       } catch (error) {

@@ -7,6 +7,10 @@ const cryptoCurrency = require("../utils/CryptoCurrency.json");
 const sortCryptoArray = require("../utils/sortCryptoArray");
 
 TelegramService.onText(/^\/price/g, async (msg) => {
+  if (msg.text === "/pricelist") {
+    return;
+  }
+
   const chatId = msg.chat.id;
   const message = "Select the currency you want to see the price for.";
   const errorMessage =
@@ -109,7 +113,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   }
 
   if (callBackDataType === "PRICE") {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrency(
+    const { price, cpd, cpw, cpm } = await CurrencyService.getPrice(
       callBackDataCurrency
     );
     let message = `<b>${callBackDataCurrency}:</b> ${price}\n\n`;

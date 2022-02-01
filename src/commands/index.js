@@ -1,6 +1,7 @@
 require("./start");
 require("./follow");
 require("./price");
+require("./pricelist");
 require("./subscriptions");
 require("./cancel");
 require("./cancelAll");

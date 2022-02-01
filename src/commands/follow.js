@@ -151,7 +151,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
       },
     });
   } else if (callBackDataType === "TIME") {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrency(
+    const { price, cpd, cpw, cpm } = await CurrencyService.getPrice(
       callBackDataCurrency
     );
     let message = "";
