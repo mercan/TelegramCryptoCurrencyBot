@@ -10,7 +10,7 @@ const sortCryptoArray = require("../utils/sortCryptoArray");
 
 TelegramService.onText(/^\/follow$/g, async (msg) => {
   const chatId = msg.chat.id;
-  const message = "Select the currency you want to track";
+  const message = "Select the currency you want to track.";
 
   await TelegramService.sendMessage(chatId, message, {
     reply_markup: {
@@ -222,6 +222,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   }
 });
 
+// Reply Message (Follow Manual)
 TelegramService.on("message", async (msg) => {
   const replyMessage = msg.reply_to_message;
   const chatId = msg.chat.id;

@@ -10,12 +10,11 @@ TelegramService.onText(/^\/currentStatus$/g, async (msg) => {
   if (!currencies.length) {
     return await TelegramService.sendMessage(
       chatId,
-      "You do not have a subscription."
+      "You do not have a subscription!"
     );
   }
 
   let message = "";
-
   for await (const { currency } of currencies) {
     const [currentType, currencyName] = currency.split("_");
     const { price, cpd, cpw, cpm } = await CurrencyService.getCurrencyPrice(

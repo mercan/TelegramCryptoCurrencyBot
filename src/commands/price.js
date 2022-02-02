@@ -10,8 +10,6 @@ const sortCryptoArray = require("../utils/sortCryptoArray");
 TelegramService.onText(/^\/price/g, async (msg) => {
   const chatId = msg.chat.id;
   const message = "Select the currency you want to see the price for.";
-  const errorMessage =
-    "Choose a crypto or forex currency\n\n<b>Example</b>: /price or /price BTC";
   const selectCurrency = msg.text.split(" ")[1];
 
   if (!selectCurrency) {
@@ -116,6 +114,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   }
 });
 
+// Reply Message (PRICEMANUAL)
 TelegramService.on("message", async (msg) => {
   const replyMessage = msg.reply_to_message;
   const chatId = msg.chat.id;
@@ -156,7 +155,7 @@ TelegramService.on("message", async (msg) => {
 
         return TelegramService.sendMessage(
           chatId,
-          "Select the currency you want to track",
+          "Select the currency you want to see the price for.",
           {
             reply_markup: {
               inline_keyboard: [...filterForex.map((forex) => [forex])],
@@ -196,7 +195,7 @@ TelegramService.on("message", async (msg) => {
 
         return TelegramService.sendMessage(
           chatId,
-          "Select the currency you want to track",
+          "Select the currency you want to see the price for.",
           {
             reply_markup: {
               inline_keyboard: [...sortedCryptoList.map((crypto) => [crypto])],

@@ -10,7 +10,7 @@ TelegramService.onText(/^\/subscriptions$/g, async (msg) => {
   if (!currencies.length) {
     return await TelegramService.sendMessage(
       chatId,
-      "You do not have a subscription."
+      "You do not have a subscription!"
     );
   }
 

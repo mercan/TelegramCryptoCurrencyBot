@@ -2,6 +2,15 @@
   "name": "telegramdovizbot",
   "version": "1.0.0",
   "main": ".src/index.js",
+  "author": {
+    "name": "İbrahim Can Mercan",
+    "email": "imrcn77@gmail.com",
+    "linkedin": "www.linkedin.com/in/İbrahim/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mercan/TelegramCryptoCurrencyBot.git"
+  },
   "scripts": {
     "start": "node ./src/index.js",
     "start:dev": "nodemon ./src/index.js"
@@ -14,5 +23,8 @@
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
     "node-telegram-bot-api": "^0.56.0"
+  },
+  "engines": {
+    "node": ">=16.3.0"
   }
 }

@@ -5,7 +5,7 @@ const NotificationService = require("../services/NotificationService");
 TelegramService.onText(/^\/cancel$/g, async (msg) => {
   const chatId = msg.chat.id;
   const message =
-    "Select the currency in which you want to cancel your subscription";
+    "Select the currency in which you want to cancel your subscription.";
 
   const currencies = await NotificationService.getSubscriber(chatId);
 
@@ -42,7 +42,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   const callbackQueryType = callbackDataArray[0];
   const currencyType = callbackDataArray[1];
   const currency = callbackDataArray[2];
-  const message = `<b>${currency}</b> your subscription has been canceled`;
+  const message = `<b>${currency}</b> your subscription has been canceled.`;
 
   if (callbackQueryType === "CANCEL") {
     // Cancel Subscriber
