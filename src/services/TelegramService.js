@@ -28,6 +28,10 @@ class TelegramService {
     return await this.bot.deleteMessage(chatId, messageId);
   }
 
+  async answerCallbackQuery(callbackQueryId, text) {
+    return await this.bot.answerCallbackQuery(callbackQueryId, text);
+  }
+
   onText(regexp, callback) {
     this.bot.onText(regexp, callback);
   }
@@ -52,10 +56,10 @@ const setCommands = [
     description:
       "You can find out the last price of the currency unit you want with the command.",
   },
-  {
-    command: "listcrypto",
-    description: "Enter the currency you want to track.",
-  },
+  // {
+  //   command: "listcurrency",
+  //   description: "Enter the currency you want to track.",
+  // },
   {
     command: "subscriptions",
     description:

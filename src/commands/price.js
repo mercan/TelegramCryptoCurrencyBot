@@ -4,24 +4,21 @@ const NotificationService = require("../services/NotificationService");
 const CurrencyService = require("../services/CurrencyService");
 
 const cryptoCurrency = require("../utils/CryptoCurrency.json");
+const forexCurrency = require("../utils/forex.json");
 const sortCryptoArray = require("../utils/sortCryptoArray");
 
 TelegramService.onText(/^\/price/g, async (msg) => {
-  if (msg.text === "/pricelist") {
-    return;
-  }
-
   const chatId = msg.chat.id;
   const message = "Select the currency you want to see the price for.";
   const errorMessage =
-    "Select a crypto currency\n\n<b>Example</b>: /price or /price BTC";
-  const selectCrypto = msg.text.split(" ")[1];
+    "Choose a crypto or forex currency\n\n<b>Example</b>: /price or /price BTC";
+  const selectCurrency = msg.text.split(" ")[1];
 
-  if (!selectCrypto) {
-    const subscribers = await NotificationService.getSubscriber(chatId);
+  if (!selectCurrency) {
+    const currencies = await NotificationService.getSubscriber(chatId);
 
-    if (!subscribers.length) {
-      return await TelegramService.sendMessage(chatId, message, {
+    if (!currencies.length) {
+      return TelegramService.sendMessage(chatId, message, {
         reply_markup: {
           inline_keyboard: [
             [
@@ -36,11 +33,11 @@ TelegramService.onText(/^\/price/g, async (msg) => {
     }
 
     const inline_keyboard = [
-      ...subscribers.map((subscriber) => {
+      ...currencies.map(({ currency }) => {
         return [
           {
-            text: `${subscriber.currency}`,
-            callback_data: `PRICE_${subscriber.currency}`,
+            text: currency.split("_")[1],
+            callback_data: `PRICE_${currency}`,
           },
         ];
       }),
@@ -53,45 +50,9 @@ TelegramService.onText(/^\/price/g, async (msg) => {
       },
     ]);
 
-    await TelegramService.sendMessage(chatId, message, {
+    return TelegramService.sendMessage(chatId, message, {
       reply_markup: {
         inline_keyboard,
-      },
-    });
-  } else {
-    const filterCrypto = cryptoCurrency.flatMap((crypto) => {
-      if (
-        selectCrypto + "USD" === crypto ||
-        selectCrypto + "BUSD" === crypto ||
-        selectCrypto + "EUR" === crypto ||
-        selectCrypto + "TRY" === crypto ||
-        selectCrypto + "GBP" === crypto ||
-        selectCrypto + "RUB" === crypto ||
-        selectCrypto + "AUD" === crypto
-      ) {
-        return {
-          text:
-            crypto.slice(0, selectCrypto.length) +
-            " • " +
-            crypto.slice(selectCrypto.length, crypto.length),
-          callback_data: `PRICE_${crypto}`,
-        };
-      } else {
-        return [];
-      }
-    });
-
-    if (filterCrypto.length === 0) {
-      return await TelegramService.sendMessage(chatId, errorMessage, {
-        parse_mode: "HTML",
-      });
-    }
-
-    const sortedCryptoList = sortCryptoArray(filterCrypto, selectCrypto);
-
-    await TelegramService.sendMessage(chatId, message, {
-      reply_markup: {
-        inline_keyboard: [...sortedCryptoList.map((crypto) => [crypto])],
       },
     });
   }
@@ -99,24 +60,35 @@ TelegramService.onText(/^\/price/g, async (msg) => {
 
 TelegramService.on("callback_query", async (callbackQuery) => {
   const messageId = callbackQuery.message.message_id;
-  const message = "Select a crypto currency\n\n<b>Example</b>: /price BTC";
   const chatId = callbackQuery.message.chat.id;
-  const callBackData = callbackQuery.data;
-  const callBackDataSplit = callBackData.split("_");
-  const callBackDataType = callBackDataSplit[0];
-  const callBackDataCurrency = callBackDataSplit[1];
+  const callbackData = callbackQuery.data;
+  const callbackDataSplit = callbackData.split("_");
+  const callbackDataType = callbackDataSplit[0];
+  const currencyType = callbackDataSplit[1];
+  const currency = callbackDataSplit[2];
 
-  if (callBackDataType === "PRICEMANUAL") {
-    return await TelegramService.editMessageText(chatId, messageId, message, {
-      parse_mode: "HTML",
-    });
+  if (callbackDataType === "PRICEMANUAL") {
+    // Delete Previous Message
+    await TelegramService.deleteMessage(chatId, messageId);
+
+    return TelegramService.sendMessage(
+      chatId,
+      "Enter the currency you want to see the price for.",
+      {
+        reply_markup: {
+          input_field_placeholder: "Enter the currency",
+          force_reply: true,
+        },
+      }
+    );
   }
 
-  if (callBackDataType === "PRICE") {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getPriceCrypto(
-      callBackDataCurrency
+  if (callbackDataType === "PRICE") {
+    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrencyPrice(
+      currencyType,
+      currency
     );
-    let message = `<b>${callBackDataCurrency}:</b> ${price}\n\n`;
+    let message = `<b>${currency}:</b> ${price}\n\n`;
 
     if (cpd) {
       if (cpd >= 0) {
@@ -141,5 +113,101 @@ TelegramService.on("callback_query", async (callbackQuery) => {
     await TelegramService.editMessageText(chatId, messageId, message, {
       parse_mode: "HTML",
     });
+  }
+});
+
+TelegramService.on("message", async (msg) => {
+  const replyMessage = msg.reply_to_message;
+  const chatId = msg.chat.id;
+
+  if (replyMessage) {
+    if (
+      replyMessage.text === "Enter the currency you want to see the price for."
+    ) {
+      const selectCurrency = msg.text;
+
+      // Forex Currency
+      const filterForex = forexCurrency.flatMap((forex) => {
+        if (
+          selectCurrency + "USD" === forex ||
+          selectCurrency + "EUR" === forex ||
+          selectCurrency + "TRY" === forex ||
+          selectCurrency + "GBP" === forex ||
+          selectCurrency + "RUB" === forex ||
+          selectCurrency + "AUD" === forex ||
+          selectCurrency + "JPY" === forex ||
+          selectCurrency + "CNY" === forex
+        ) {
+          return {
+            text:
+              forex.slice(0, selectCurrency.length) +
+              " • " +
+              forex.slice(selectCurrency.length, forex.length),
+            callback_data: `PRICE_FOREX_${forex}`,
+          };
+        }
+
+        return [];
+      });
+
+      if (filterForex.length) {
+        // Delete Reply Message
+        await TelegramService.deleteMessage(chatId, replyMessage.message_id);
+
+        return TelegramService.sendMessage(
+          chatId,
+          "Select the currency you want to track",
+          {
+            reply_markup: {
+              inline_keyboard: [...filterForex.map((forex) => [forex])],
+            },
+          }
+        );
+      }
+
+      // Crypto Currency
+      const filterCrypto = cryptoCurrency.flatMap((crypto) => {
+        if (
+          selectCurrency + "USD" === crypto ||
+          selectCurrency + "BUSD" === crypto ||
+          selectCurrency + "EUR" === crypto ||
+          selectCurrency + "TRY" === crypto ||
+          selectCurrency + "GBP" === crypto ||
+          selectCurrency + "RUB" === crypto ||
+          selectCurrency + "AUD" === crypto
+        ) {
+          return {
+            text:
+              crypto.slice(0, selectCurrency.length) +
+              " • " +
+              crypto.slice(selectCurrency.length, crypto.length),
+            callback_data: `PRICE_CRYPTO_${crypto}`,
+          };
+        }
+
+        return [];
+      });
+
+      if (filterCrypto.length) {
+        const sortedCryptoList = sortCryptoArray(filterCrypto, selectCurrency);
+
+        // Delete Reply Message
+        await TelegramService.deleteMessage(chatId, replyMessage.message_id);
+
+        return TelegramService.sendMessage(
+          chatId,
+          "Select the currency you want to track",
+          {
+            reply_markup: {
+              inline_keyboard: [...sortedCryptoList.map((crypto) => [crypto])],
+            },
+          }
+        );
+      }
+
+      // Delete Reply Message
+      await TelegramService.deleteMessage(chatId, replyMessage.message_id);
+      return TelegramService.sendMessage(chatId, "Invalid currency.");
+    }
   }
 });

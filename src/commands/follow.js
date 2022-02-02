@@ -3,6 +3,11 @@ const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
 const CurrencyService = require("../services/CurrencyService");
 
+// Utils
+const cryptoCurrency = require("../utils/CryptoCurrency.json");
+const forexCurrency = require("../utils/forex.json");
+const sortCryptoArray = require("../utils/sortCryptoArray");
+
 TelegramService.onText(/^\/follow$/g, async (msg) => {
   const chatId = msg.chat.id;
   const message = "Select the currency you want to track";
@@ -13,65 +18,53 @@ TelegramService.onText(/^\/follow$/g, async (msg) => {
         [
           {
             text: "USD • TRY",
-            callback_data: "FOLLOW_USDTRY",
+            callback_data: "FOLLOW_FOREX_USDTRY",
           },
           {
             text: "EUR • USD",
-            callback_data: "FOLLOW_EURUSD",
+            callback_data: "FOLLOW_FOREX_EURUSD",
           },
         ],
         [
           {
             text: "Bitcoin USD (BTC • USD)",
-            callback_data: "FOLLOW_BTCUSD",
-          },
-        ],
-        [
-          {
-            text: "Bitcoin EUR (BTC • EUR)",
-            callback_data: "FOLLOW_BTCEUR",
+            callback_data: "FOLLOW_CRYPTO_BTCUSD",
           },
         ],
         [
           {
             text: "Bitcoin TRY (BTC • TRY)",
-            callback_data: "FOLLOW_BTCTRY",
+            callback_data: "FOLLOW_CRYPTO_BTCTRY",
           },
         ],
         [
           {
             text: "Ethereum USD (ETH • USD)",
-            callback_data: "FOLLOW_ETHUSD",
+            callback_data: "FOLLOW_CRYPTO_ETHUSD",
           },
         ],
         [
           {
             text: "BNB USD (BNB • USD)",
-            callback_data: "FOLLOW_BNBUSD",
+            callback_data: "FOLLOW_CRYPTO_BNBUSD",
+          },
+        ],
+        [
+          {
+            text: "GOLD USD (XAU • USD)",
+            callback_data: "FOLLOW_FOREX_XAUUSD",
           },
         ],
         [
           {
             text: "Lite Coin USD (LTC • USD)",
-            callback_data: "FOLLOW_LTCUSD",
+            callback_data: "FOLLOW_CRYPTO_LTCUSD",
           },
         ],
         [
           {
-            text: "NEO USD (NEO • USD)",
-            callback_data: "FOLLOW_NEOUSD",
-          },
-        ],
-        [
-          {
-            text: "Ripple USD (XRP • USD)",
-            callback_data: "FOLLOW_XRPUSD",
-          },
-        ],
-        [
-          {
-            text: "DOGE USD (DOGE • USD)",
-            callback_data: "FOLLOW_DOGEUSD",
+            text: "SHIB USD (SHIB • USD)",
+            callback_data: "FOLLOW_CRYPTO_SHIBUSD",
           },
         ],
         [
@@ -85,29 +78,35 @@ TelegramService.onText(/^\/follow$/g, async (msg) => {
   });
 });
 
+// Follow And Follow Manual
 TelegramService.on("callback_query", async (callbackQuery) => {
-  const messageId = callbackQuery.message.message_id;
   const chatId = callbackQuery.message.chat.id;
-  const username = callbackQuery.from.username || null;
-  const callBackData = callbackQuery.data;
-  const callBackDataSplit = callBackData.split("_");
-  const callBackDataType = callBackDataSplit[0];
-  const callBackDataCurrency = callBackDataSplit[1];
-  const callBackDataTimeUnit = callBackDataSplit[3];
-  const notificationTime = callBackDataSplit[2];
+  const messageId = callbackQuery.message.message_id;
+  const callbackData = callbackQuery.data;
+  const callbackDataArray = callbackData.split("_");
+  const callbackQueryType = callbackDataArray[0];
 
-  // Manuel input
-  if (callBackDataType === "FOLLOWMANUAL") {
-    const message =
-      "Enter the currency you want to track\n\n<b>Example</b>: /listcrypto BTC";
+  if (callbackQueryType === "FOLLOW" || callbackQueryType === "FOLLOWMANUAL") {
+    // Follow Manual
+    if (callbackQueryType === "FOLLOWMANUAL") {
+      // Delete previous message
+      await TelegramService.deleteMessage(chatId, messageId);
 
-    return await TelegramService.editMessageText(chatId, messageId, message, {
-      parse_mode: "HTML",
-    });
-  }
-
-  if (callBackDataType === "FOLLOW") {
-    const message = `How often do you want to receive notifications from <b>${callBackDataCurrency}</b>?`;
+      return TelegramService.sendMessage(
+        chatId,
+        "Enter the currency you want to track.",
+        {
+          reply_markup: {
+            input_field_placeholder: "Enter the currency",
+            force_reply: true,
+          },
+        }
+      );
+    }
+    // Follow
+    const currencyType = callbackDataArray[1];
+    const currency = callbackDataArray[2];
+    const message = `How often do you want to receive notifications from <b>${currency}</b>?`;
 
     await TelegramService.editMessageText(chatId, messageId, message, {
       parse_mode: "HTML",
@@ -116,57 +115,75 @@ TelegramService.on("callback_query", async (callbackQuery) => {
           [
             {
               text: "5 Minutes",
-              callback_data: `TIME_${callBackDataCurrency}_5_MINUTE`,
+              callback_data: `TIME_${currencyType}_${currency}_5_MINUTE`,
             },
             {
               text: "10 Minutes",
-              callback_data: `TIME_${callBackDataCurrency}_10_MINUTE`,
+              callback_data: `TIME_${currencyType}_${currency}_10_MINUTE`,
             },
             {
               text: "30 Minutes",
-              callback_data: `TIME_${callBackDataCurrency}_30_MINUTE`,
+              callback_data: `TIME_${currencyType}_${currency}_30_MINUTE`,
             },
           ],
           [
             {
               text: "1 Hour",
-              callback_data: `TIME_${callBackDataCurrency}_1_HOUR`,
+              callback_data: `TIME_${currencyType}_${currency}_1_HOUR`,
             },
             {
               text: "6 Hour",
-              callback_data: `TIME_${callBackDataCurrency}_6_HOUR`,
+              callback_data: `TIME_${currencyType}_${currency}_6_HOUR`,
             },
             {
               text: "12 Hour",
-              callback_data: `TIME_${callBackDataCurrency}_12_HOUR`,
+              callback_data: `TIME_${currencyType}_${currency}_12_HOUR`,
             },
           ],
           [
             {
               text: "1 Day",
-              callback_data: `TIME_${callBackDataCurrency}_1_DAY`,
+              callback_data: `TIME_${currencyType}_${currency}_1_DAY`,
             },
           ],
         ],
       },
     });
-  } else if (callBackDataType === "TIME") {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getPriceCrypto(
-      callBackDataCurrency
-    );
+  }
+});
+
+// TIME
+TelegramService.on("callback_query", async (callbackQuery) => {
+  const chatId = callbackQuery.message.chat.id;
+  const messageId = callbackQuery.message.message_id;
+  const username = callbackQuery.from.username || null;
+  const callbackData = callbackQuery.data;
+  const callbackDataArray = callbackData.split("_");
+  const callbackQueryType = callbackDataArray[0];
+  const currencyType = callbackDataArray[1];
+  const currency = callbackDataArray[2];
+  const time = callbackDataArray[3];
+  const timeType = callbackDataArray[4];
+
+  if (callbackQueryType === "TIME") {
     let message = "";
 
-    if (callBackDataTimeUnit === "MINUTE") {
-      message = `You will receive a notifications every ${notificationTime} minutes.\n\n`;
-    } else if (callBackDataTimeUnit === "HOUR" && notificationTime === "1") {
-      message = `You will receive a notifications every ${notificationTime} hour.\n\n`;
-    } else if (callBackDataTimeUnit === "HOUR") {
-      message = `You will receive a notifications every ${notificationTime} hours.\n\n`;
-    } else if (callBackDataTimeUnit === "DAY") {
+    if (timeType === "MINUTE") {
+      message = `You will receive a notifications every ${time} minutes.\n\n`;
+    } else if (timeType === "HOUR" && time === "1") {
+      message = `You will receive a notifications every ${time} hour.\n\n`;
+    } else if (timeType === "HOUR") {
+      message = `You will receive a notifications every ${time} hours.\n\n`;
+    } else if (timeType === "DAY") {
       message = `You will receive a notification once a day.\n\n`;
     }
 
-    message += `<b>${callBackDataCurrency}:</b> ${price}\n\n`;
+    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrencyPrice(
+      currencyType,
+      currency
+    );
+
+    message += `<b>${currency}:</b> ${price}\n\n`;
 
     if (cpd) {
       if (cpd >= 0) {
@@ -192,25 +209,109 @@ TelegramService.on("callback_query", async (callbackQuery) => {
       parse_mode: "HTML",
     });
 
-    let notificationTimeUnit = "";
-
-    if (callBackDataTimeUnit === "MINUTE") {
-      notificationTimeUnit = "minute";
-    } else if (callBackDataTimeUnit === "HOUR") {
-      notificationTimeUnit = "hour";
-    } else if (callBackDataTimeUnit === "DAY") {
-      notificationTimeUnit = "day";
-    }
-
-    // Save notification
     const notification = {
       username,
       chatId,
-      currency: callBackDataCurrency,
-      time: notificationTime,
-      timeUnit: notificationTimeUnit,
+      currency: `${currencyType}_${currency}`,
+      time: time,
+      timeUnit: timeType.toLowerCase(),
     };
 
+    // Save Notification
     await NotificationService.save(notification);
+  }
+});
+
+TelegramService.on("message", async (msg) => {
+  const replyMessage = msg.reply_to_message;
+  const chatId = msg.chat.id;
+
+  if (replyMessage) {
+    if (replyMessage.text === "Enter the currency you want to track.") {
+      const selectCurrency = msg.text;
+
+      // Forex Currency
+      const filterForex = forexCurrency.flatMap((forex) => {
+        if (
+          selectCurrency + "USD" === forex ||
+          selectCurrency + "EUR" === forex ||
+          selectCurrency + "TRY" === forex ||
+          selectCurrency + "GBP" === forex ||
+          selectCurrency + "RUB" === forex ||
+          selectCurrency + "AUD" === forex ||
+          selectCurrency + "JPY" === forex ||
+          selectCurrency + "CNY" === forex
+        ) {
+          return {
+            text:
+              forex.slice(0, selectCurrency.length) +
+              " • " +
+              forex.slice(selectCurrency.length, forex.length),
+            callback_data: `FOLLOW_FOREX_${forex}`,
+          };
+        }
+
+        return [];
+      });
+
+      if (filterForex.length) {
+        // Delete Reply Message
+        await TelegramService.deleteMessage(chatId, replyMessage.message_id);
+
+        return TelegramService.sendMessage(
+          chatId,
+          "Enter the currency you want to track.",
+          {
+            reply_markup: {
+              inline_keyboard: [...filterForex.map((forex) => [forex])],
+            },
+          }
+        );
+      }
+
+      // Crypto Currency
+      const filterCrypto = cryptoCurrency.flatMap((crypto) => {
+        if (
+          selectCurrency + "USD" === crypto ||
+          selectCurrency + "BUSD" === crypto ||
+          selectCurrency + "EUR" === crypto ||
+          selectCurrency + "TRY" === crypto ||
+          selectCurrency + "GBP" === crypto ||
+          selectCurrency + "RUB" === crypto ||
+          selectCurrency + "AUD" === crypto
+        ) {
+          return {
+            text:
+              crypto.slice(0, selectCurrency.length) +
+              " • " +
+              crypto.slice(selectCurrency.length, crypto.length),
+            callback_data: `FOLLOW_CRYPTO_${crypto}`,
+          };
+        }
+
+        return [];
+      });
+
+      if (filterCrypto.length) {
+        const sortedCryptoList = sortCryptoArray(filterCrypto, selectCurrency);
+
+        // Delete Reply Message
+        await TelegramService.deleteMessage(chatId, replyMessage.message_id);
+
+        return TelegramService.sendMessage(
+          chatId,
+          "Enter the currency you want to track.",
+          {
+            reply_markup: {
+              inline_keyboard: [...sortedCryptoList.map((crypto) => [crypto])],
+            },
+          }
+        );
+      }
+
+      // Delete Reply Message
+      await TelegramService.deleteMessage(chatId, replyMessage.message_id);
+      return TelegramService.sendMessage(chatId, "Invalid currency.");
+    }
   }
 });

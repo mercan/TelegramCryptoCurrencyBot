@@ -17,10 +17,12 @@ TelegramService.onText(/^\/currentStatus$/g, async (msg) => {
   let message = "";
 
   for await (const { currency } of currencies) {
-    const { price, cpd, cpw, cpm } = await CurrencyService.getPriceCrypto(
-      currency
+    const [currentType, currencyName] = currency.split("_");
+    const { price, cpd, cpw, cpm } = await CurrencyService.getCurrencyPrice(
+      currentType,
+      currencyName
     );
-    message += `<b>${currency}:</b> ${price}\n\n`;
+    message += `<b>${currencyName}:</b> ${price}\n\n`;
 
     if (cpd) {
       if (cpd >= 0) {

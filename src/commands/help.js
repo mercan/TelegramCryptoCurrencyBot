@@ -12,6 +12,7 @@ You can terminate your subscriptions at any time or make changes to the frequenc
 
 <b>Quick Use:</b>
 /follow You can start a new subscription with the command, or you can change the frequency of sending notifications of your existing subscription.
+/currentStatus You can see the current status of your subscriptions.
 /price You can find out the last price of the currency unit you want with the command.
 /subscriptions With the command, you can list all your subscriptions and see which channel you are on in the currency you subscribe to.
 /cancel You can terminate your subscription to the currency of your choice with the command. The subscription can then be restarted.

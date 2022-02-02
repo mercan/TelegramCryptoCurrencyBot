@@ -5,7 +5,7 @@ const NotificationService = require("../services/NotificationService");
 TelegramService.onText(/^\/subscriptions$/g, async (msg) => {
   const chatId = msg.chat.id;
   const currencies = await NotificationService.getSubscriber(chatId);
-  let message = "📌 <b>My Subscriptions:</b>📌\n\n";
+  let message = "📌 <b>My Subscriptions</b> 📌\n\n";
 
   if (!currencies.length) {
     return await TelegramService.sendMessage(
@@ -14,9 +14,11 @@ TelegramService.onText(/^\/subscriptions$/g, async (msg) => {
     );
   }
 
-  currencies.forEach((currency) => {
-    message += `<b>${currency.currency}:</b> ${currency.time} ${
-      currency.timeUnit[0].toUpperCase() + currency.timeUnit.slice(1)
+  currencies.forEach(({ currency, time, timeUnit }) => {
+    const currencyName = currency.split("_")[1];
+
+    message += `<b>${currencyName}:</b> ${time} ${
+      timeUnit[0].toUpperCase() + timeUnit.slice(1)
     }\n`;
   });
 

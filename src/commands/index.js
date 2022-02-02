@@ -5,5 +5,5 @@ require("./currentStatus");
 require("./subscriptions");
 require("./cancel");
 require("./cancelAll");
-require("./listCryptocurrency");
+// require("./listCurrency");
 require("./help");

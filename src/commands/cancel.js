@@ -3,37 +3,32 @@ const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
 
 TelegramService.onText(/^\/cancel$/g, async (msg) => {
-  const messageId = msg.message_id;
   const chatId = msg.chat.id;
   const message =
     "Select the currency in which you want to cancel your subscription";
 
   const currencies = await NotificationService.getSubscriber(chatId);
 
-  if (currencies.length === 0) {
+  if (!currencies.length) {
     return await TelegramService.sendMessage(
       chatId,
-       "You do not have a subscription!"
+      "You do not have a subscription!"
     );
   }
 
-  const currenciesList = currencies.map((subscriber) => {
-    return subscriber.currency;
+  const currencyList = currencies.map(({ currency }) => {
+    return [
+      {
+        text: currency.split("_")[1],
+        callback_data: `CANCEL_${currency}`,
+      },
+    ];
   });
 
   await TelegramService.sendMessage(chatId, message, {
     parse_mode: "HTML",
     reply_markup: {
-      inline_keyboard: [
-        ...currenciesList.map((currency) => {
-          return [
-            {
-              text: currency,
-              callback_data: `CANCEL_${currency}`,
-            },
-          ];
-        }),
-      ],
+      inline_keyboard: [...currencyList],
     },
   });
 });
@@ -42,14 +37,19 @@ TelegramService.onText(/^\/cancel$/g, async (msg) => {
 TelegramService.on("callback_query", async (callbackQuery) => {
   const messageId = callbackQuery.message.message_id;
   const chatId = callbackQuery.message.chat.id;
-  const callBackData = callbackQuery.data;
-  const callBackDataSplit = callBackData.split("_");
-  const currency = callBackDataSplit[1];
+  const callbackData = callbackQuery.data;
+  const callbackDataArray = callbackData.split("_");
+  const callbackQueryType = callbackDataArray[0];
+  const currencyType = callbackDataArray[1];
+  const currency = callbackDataArray[2];
   const message = `<b>${currency}</b> your subscription has been canceled`;
 
-  if (callBackDataSplit[0] === "CANCEL") {
+  if (callbackQueryType === "CANCEL") {
     // Cancel Subscriber
-    await NotificationService.cancelSubscriber(chatId, currency);
+    await NotificationService.cancelSubscriber(
+      chatId,
+      `${currencyType}_${currency}`
+    );
 
     await TelegramService.editMessageText(chatId, messageId, message, {
       parse_mode: "HTML",
