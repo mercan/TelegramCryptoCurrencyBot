@@ -24,7 +24,7 @@
     "cancel": {
       "selectCurency": "Select the currency in which you want to cancel your subscription.",
       "noSubscription": "You do not have a subscription!",
-      "callbackQuery": {
+      "callbackQueryLang": {
         "unSubscribe": "<b>{0}</b> your subscription has been canceled."
       }
     },
@@ -40,42 +40,43 @@
       "button": {
         "manualCurrency": "Manually enter the currency"
       },
-      "callbackQuery": {
-        "FOLLOWMANUAL": {
+      "callbackQueryLang": {
+        "followmanual": {
           "message": "Enter the currency you want to track.",
-          "inputPlaceholder": "Enter the currency"
+          "placeholder": "Enter the currency"
         },
-        "FOLLOW": {
-          "notificationFrequency": "How often do you want to receive notifications from <b>{0}</b>?"
+        "follow": {
+          "frequency": "How often do you want to receive notifications from <b>{0}</b>?"
         },
-        "TIME": {
-          "MINUTE": "You will receive a notifications every {0} minutes.\n\n",
-          "HOUR": "You will receive a notifications every {0} hour.\n\n",
-          "HOURS": "You will receive a notifications every {0} hours.\n\n",
-          "DAY": "You will receive a notification once a day.\n\n"
+        "time": {
+          "minute": "You will receive a notifications every {0} minutes.\n\n",
+          "hour": "You will receive a notifications every {0} hour.\n\n",
+          "hours": "You will receive a notifications every {0} hours.\n\n",
+          "day": "You will receive a notification once a day.\n\n"
         }
-      }
+      },
+      "errorMessage": "Invalid Currency!"
     },
     "price": {
       "selectCurrency": "Select the currency you want to see the price for.",
       "button": {
         "manualCurrency": "Manually enter the currency"
       },
-      "callbackQuery": {
-        "PRICEMANUAL": {
-          "selectCurrency": "Select the currency you want to see the price for.",
-          "inputPlaceholder": "Enter the currency"
+      "callbackQueryLang": {
+        "pricemanual": {
+          "selectCurrency": "Enter the currency you want to see the price of.",
+          "placeholder": "Enter the currency"
         }
       },
       "replyMessage": {
         "PRICEMANUAL": {
-          "selectCurrency": "Select the currency you want to see the price for.",
-          "inputPlaceholder": "Enter the currency"
+          "selectCurrency": "Enter the currency you want to see the price of.",
+          "placeholder": "Enter the currency"
         }
       },
       "errorMessage": "Invalid Currency!"
     },
-    "subscriponts": {
+    "subscriptions": {
       "mySubscriptions": "📌 <b>My Subscriptions</b> 📌",
       "noSubscriptions": "You do not have a subscription!"
     }

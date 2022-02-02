@@ -2,6 +2,7 @@
 const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
 const CurrencyService = require("../services/CurrencyService");
+const LanguageService = require("../services/LanguageService");
 
 // Utils
 const cryptoCurrency = require("../utils/CryptoCurrency.json");
@@ -10,7 +11,10 @@ const sortCryptoArray = require("../utils/sortCryptoArray");
 
 TelegramService.onText(/^\/follow$/g, async (msg) => {
   const chatId = msg.chat.id;
-  const message = "Select the currency you want to track.";
+  const messages = new LanguageService(msg.from.language_code).getCommands(
+    "follow"
+  );
+  const message = messages.selectCurrencyTrack;
 
   await TelegramService.sendMessage(chatId, message, {
     reply_markup: {
@@ -69,7 +73,7 @@ TelegramService.onText(/^\/follow$/g, async (msg) => {
         ],
         [
           {
-            text: "Manually enter the currency",
+            text: messages.button.manualCurrency,
             callback_data: "FOLLOWMANUAL",
           },
         ],
@@ -85,6 +89,9 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   const callbackData = callbackQuery.data;
   const callbackDataArray = callbackData.split("_");
   const callbackQueryType = callbackDataArray[0];
+  const language = new LanguageService(callbackQuery.from.language_code);
+  const { callbackQueryLang } = language.getCommands("follow");
+  const { buttonTimes } = language.language;
 
   if (callbackQueryType === "FOLLOW" || callbackQueryType === "FOLLOWMANUAL") {
     // Follow Manual
@@ -94,10 +101,10 @@ TelegramService.on("callback_query", async (callbackQuery) => {
 
       return TelegramService.sendMessage(
         chatId,
-        "Enter the currency you want to track.",
+        callbackQueryLang.followmanual.message,
         {
           reply_markup: {
-            input_field_placeholder: "Enter the currency",
+            input_field_placeholder: callbackQueryLang.followmanual.placeholder,
             force_reply: true,
           },
         }
@@ -106,7 +113,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
     // Follow
     const currencyType = callbackDataArray[1];
     const currency = callbackDataArray[2];
-    const message = `How often do you want to receive notifications from <b>${currency}</b>?`;
+    const message = callbackQueryLang.follow.frequency.replace("{0}", currency);
 
     await TelegramService.editMessageText(chatId, messageId, message, {
       parse_mode: "HTML",
@@ -114,35 +121,35 @@ TelegramService.on("callback_query", async (callbackQuery) => {
         inline_keyboard: [
           [
             {
-              text: "5 Minutes",
+              text: buttonTimes["5min"],
               callback_data: `TIME_${currencyType}_${currency}_5_MINUTE`,
             },
             {
-              text: "10 Minutes",
+              text: buttonTimes["10min"],
               callback_data: `TIME_${currencyType}_${currency}_10_MINUTE`,
             },
             {
-              text: "30 Minutes",
+              text: buttonTimes["30min"],
               callback_data: `TIME_${currencyType}_${currency}_30_MINUTE`,
             },
           ],
           [
             {
-              text: "1 Hour",
+              text: buttonTimes["1hour"],
               callback_data: `TIME_${currencyType}_${currency}_1_HOUR`,
             },
             {
-              text: "6 Hour",
+              text: buttonTimes["6hour"],
               callback_data: `TIME_${currencyType}_${currency}_6_HOUR`,
             },
             {
-              text: "12 Hour",
+              text: buttonTimes["12hour"],
               callback_data: `TIME_${currencyType}_${currency}_12_HOUR`,
             },
           ],
           [
             {
-              text: "1 Day",
+              text: buttonTimes["1day"],
               callback_data: `TIME_${currencyType}_${currency}_1_DAY`,
             },
           ],
@@ -164,18 +171,31 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   const currency = callbackDataArray[2];
   const time = callbackDataArray[3];
   const timeType = callbackDataArray[4];
+  const language = new LanguageService(callbackQuery.from.language_code);
+  const { callbackQueryLang } = language.getCommands("follow");
+  const {
+    dailyUpChange,
+    dailyDownChange,
+    weeklyUpChange,
+    weeklyDownChange,
+    monthlyUpChange,
+    monthlyDownChange,
+  } = language.get("currencyMessage");
 
   if (callbackQueryType === "TIME") {
     let message = "";
 
     if (timeType === "MINUTE") {
-      message = `You will receive a notifications every ${time} minutes.\n\n`;
-    } else if (timeType === "HOUR" && time === "1") {
-      message = `You will receive a notifications every ${time} hour.\n\n`;
-    } else if (timeType === "HOUR") {
-      message = `You will receive a notifications every ${time} hours.\n\n`;
+      message = callbackQueryLang.time.minute.replace("{0}", time);
+    } else if (
+      timeType === "HOUR" &&
+      (time === "1" || callbackQuery.from.language_code === "tr")
+    ) {
+      message = callbackQueryLang.time.hour.replace("{0}", time);
+    } else if (timeType === "HOUR" && callbackQueryLang.time.hours) {
+      message = callbackQueryLang.time.hours.replace("{0}", time);
     } else if (timeType === "DAY") {
-      message = `You will receive a notification once a day.\n\n`;
+      message = callbackQueryLang.time.day;
     }
 
     const { price, cpd, cpw, cpm } = await CurrencyService.getCurrencyPrice(
@@ -187,21 +207,21 @@ TelegramService.on("callback_query", async (callbackQuery) => {
 
     if (cpd) {
       if (cpd >= 0) {
-        message += `Daily Change: <b>↑ +${cpd}%</b>\n`;
+        message += dailyUpChange.replace("{0}", cpd);
       } else {
-        message += `Daily Change: <b>↓ ${cpd}%</b>\n`;
+        message += dailyDownChange.replace("{0}", cpd);
       }
 
       if (cpw >= 0) {
-        message += `Weekly Change: <b>↑ +${cpw}%</b>\n`;
+        message += weeklyUpChange.replace("{0}", cpw);
       } else {
-        message += `Weekly Change: <b>↓ ${cpw}%</b>\n`;
+        message += weeklyDownChange.replace("{0}", cpw);
       }
 
       if (cpm >= 0) {
-        message += `Monthly Change: <b>↑ +${cpm}%</b>`;
+        message += monthlyUpChange.replace("{0}", cpm);
       } else {
-        message += `Monthly Change: <b>↓ ${cpm}%</b>`;
+        message += monthlyDownChange.replace("{0}", cpm);
       }
     }
 
@@ -228,7 +248,13 @@ TelegramService.on("message", async (msg) => {
   const chatId = msg.chat.id;
 
   if (replyMessage) {
-    if (replyMessage.text === "Enter the currency you want to track.") {
+    if (
+      replyMessage.text === "Takip etmek istediğiniz para birimini girin." ||
+      replyMessage.text === "Enter the currency you want to track."
+    ) {
+      const messages = new LanguageService(msg.from.language_code).getCommands(
+        "follow"
+      );
       const selectCurrency = msg.text;
 
       // Forex Currency
@@ -261,7 +287,7 @@ TelegramService.on("message", async (msg) => {
 
         return TelegramService.sendMessage(
           chatId,
-          "Enter the currency you want to track.",
+          messages.selectCurrencyTrack,
           {
             reply_markup: {
               inline_keyboard: [...filterForex.map((forex) => [forex])],
@@ -301,7 +327,7 @@ TelegramService.on("message", async (msg) => {
 
         return TelegramService.sendMessage(
           chatId,
-          "Enter the currency you want to track.",
+          messages.selectCurrencyTrack,
           {
             reply_markup: {
               inline_keyboard: [...sortedCryptoList.map((crypto) => [crypto])],
@@ -312,7 +338,7 @@ TelegramService.on("message", async (msg) => {
 
       // Delete Reply Message
       await TelegramService.deleteMessage(chatId, replyMessage.message_id);
-      return TelegramService.sendMessage(chatId, "Invalid currency.");
+      return TelegramService.sendMessage(chatId, messages.errorMessage);
     }
   }
 });

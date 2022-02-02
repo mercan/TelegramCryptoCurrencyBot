@@ -1,19 +1,18 @@
 // Services
 const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
+const LanguageService = require("../services/LanguageService");
 
 TelegramService.onText(/^\/cancel$/g, async (msg) => {
   const chatId = msg.chat.id;
-  const message =
-    "Select the currency in which you want to cancel your subscription.";
+  const messages = new LanguageService(msg.from.language_code).getCommands(
+    "cancel"
+  );
 
   const currencies = await NotificationService.getSubscriber(chatId);
 
   if (!currencies.length) {
-    return await TelegramService.sendMessage(
-      chatId,
-      "You do not have a subscription!"
-    );
+    return await TelegramService.sendMessage(chatId, messages.noSubscription);
   }
 
   const currencyList = currencies.map(({ currency }) => {
@@ -25,7 +24,7 @@ TelegramService.onText(/^\/cancel$/g, async (msg) => {
     ];
   });
 
-  await TelegramService.sendMessage(chatId, message, {
+  await TelegramService.sendMessage(chatId, messages.selectCurency, {
     parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: [...currencyList],
@@ -42,9 +41,12 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   const callbackQueryType = callbackDataArray[0];
   const currencyType = callbackDataArray[1];
   const currency = callbackDataArray[2];
-  const message = `<b>${currency}</b> your subscription has been canceled.`;
 
   if (callbackQueryType === "CANCEL") {
+    const messages = new LanguageService(
+      callbackQuery.from.language_code
+    ).getCommands("cancel");
+    const message = messages.callbackQuery.unSubscribe.replace("{0}", currency);
     // Cancel Subscriber
     await NotificationService.cancelSubscriber(
       chatId,

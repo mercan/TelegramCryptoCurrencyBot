@@ -1,17 +1,18 @@
 // Services
 const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
+const LanguageService = require("../services/LanguageService");
 
 TelegramService.onText(/^\/subscriptions$/g, async (msg) => {
   const chatId = msg.chat.id;
   const currencies = await NotificationService.getSubscriber(chatId);
-  let message = "📌 <b>My Subscriptions</b> 📌\n\n";
+  const messages = new LanguageService(msg.from.language_code).getCommands(
+    "subscriptions"
+  );
+  let message = messages.mySubscriptions;
 
   if (!currencies.length) {
-    return await TelegramService.sendMessage(
-      chatId,
-      "You do not have a subscription!"
-    );
+    return await TelegramService.sendMessage(chatId, messages.noSubscriptions);
   }
 
   currencies.forEach(({ currency, time, timeUnit }) => {

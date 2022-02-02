@@ -2,14 +2,19 @@
 const TelegramService = require("../services/TelegramService");
 const NotificationService = require("../services/NotificationService");
 const CurrencyService = require("../services/CurrencyService");
+const LanguageService = require("../services/LanguageService");
 
+// Utils
 const cryptoCurrency = require("../utils/CryptoCurrency.json");
 const forexCurrency = require("../utils/forex.json");
 const sortCryptoArray = require("../utils/sortCryptoArray");
 
 TelegramService.onText(/^\/price/g, async (msg) => {
   const chatId = msg.chat.id;
-  const message = "Select the currency you want to see the price for.";
+  const messages = new LanguageService(msg.from.language_code).getCommands(
+    "price"
+  );
+  const message = messages.selectCurrency;
   const selectCurrency = msg.text.split(" ")[1];
 
   if (!selectCurrency) {
@@ -21,7 +26,7 @@ TelegramService.onText(/^\/price/g, async (msg) => {
           inline_keyboard: [
             [
               {
-                text: "Manually enter the currency",
+                text: messages.button.manualCurrency,
                 callback_data: "PRICEMANUAL",
               },
             ],
@@ -43,7 +48,7 @@ TelegramService.onText(/^\/price/g, async (msg) => {
 
     inline_keyboard.push([
       {
-        text: "Manually enter the currency",
+        text: messages.button.manualCurrency,
         callback_data: "PRICEMANUAL",
       },
     ]);
@@ -64,6 +69,16 @@ TelegramService.on("callback_query", async (callbackQuery) => {
   const callbackDataType = callbackDataSplit[0];
   const currencyType = callbackDataSplit[1];
   const currency = callbackDataSplit[2];
+  const language = new LanguageService(callbackQuery.from.language_code);
+  const messages = language.getCommands("price");
+  const {
+    dailyUpChange,
+    dailyDownChange,
+    weeklyUpChange,
+    weeklyDownChange,
+    monthlyUpChange,
+    monthlyDownChange,
+  } = language.get("currencyMessage");
 
   if (callbackDataType === "PRICEMANUAL") {
     // Delete Previous Message
@@ -71,10 +86,11 @@ TelegramService.on("callback_query", async (callbackQuery) => {
 
     return TelegramService.sendMessage(
       chatId,
-      "Enter the currency you want to see the price for.",
+      messages.callbackQueryLang.pricemanual.selectCurrency,
       {
         reply_markup: {
-          input_field_placeholder: "Enter the currency",
+          input_field_placeholder:
+            messages.callbackQueryLang.pricemanual.placeholder,
           force_reply: true,
         },
       }
@@ -90,21 +106,21 @@ TelegramService.on("callback_query", async (callbackQuery) => {
 
     if (cpd) {
       if (cpd >= 0) {
-        message += `Daily Change: <b>↑ +${cpd}%</b>\n`;
+        message += dailyUpChange.replace("{0}", cpd);
       } else {
-        message += `Daily Change: <b>↓ ${cpd}%</b>\n`;
+        message += dailyDownChange.replace("{0}", cpd);
       }
 
       if (cpw >= 0) {
-        message += `Weekly Change: <b>↑ +${cpw}%</b>\n`;
+        message += weeklyUpChange.replace("{0}", cpw);
       } else {
-        message += `Weekly Change: <b>↓ ${cpw}%</b>\n`;
+        message += weeklyDownChange.replace("{0}", cpw);
       }
 
       if (cpm >= 0) {
-        message += `Monthly Change: <b>↑ +${cpm}%</b>`;
+        message += monthlyUpChange.replace("{0}", cpm);
       } else {
-        message += `Monthly Change: <b>↓ ${cpm}%</b>`;
+        message += monthlyDownChange.replace("{0}", cpm);
       }
     }
 
@@ -121,8 +137,13 @@ TelegramService.on("message", async (msg) => {
 
   if (replyMessage) {
     if (
+      replyMessage.text ===
+        "Fiyatını görmek istediğiniz para birimini girin." ||
       replyMessage.text === "Enter the currency you want to see the price for."
     ) {
+      const messages = new LanguageService(msg.from.language_code).getCommands(
+        "price"
+      );
       const selectCurrency = msg.text;
 
       // Forex Currency
@@ -155,7 +176,7 @@ TelegramService.on("message", async (msg) => {
 
         return TelegramService.sendMessage(
           chatId,
-          "Select the currency you want to see the price for.",
+          messages.replyMessage.pricemanual.selectCurrency,
           {
             reply_markup: {
               inline_keyboard: [...filterForex.map((forex) => [forex])],
@@ -195,7 +216,7 @@ TelegramService.on("message", async (msg) => {
 
         return TelegramService.sendMessage(
           chatId,
-          "Select the currency you want to see the price for.",
+          messages.replyMessage.pricemanual.selectCurrency,
           {
             reply_markup: {
               inline_keyboard: [...sortedCryptoList.map((crypto) => [crypto])],
@@ -206,7 +227,7 @@ TelegramService.on("message", async (msg) => {
 
       // Delete Reply Message
       await TelegramService.deleteMessage(chatId, replyMessage.message_id);
-      return TelegramService.sendMessage(chatId, "Invalid currency.");
+      return TelegramService.sendMessage(chatId, messages.errorMessage);
     }
   }
 });

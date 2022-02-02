@@ -1,12 +1,11 @@
 {
   "currencyMessage": {
-    "currencyNameAndPrice": "<b>{0}:</b> {1}\n\n",
     "dailyUpChange": "Günlük Değişim: <b>↑ +{0}%</b>\n",
-    "dailyDownChange": "Günlük Değişim: <b>↓ -{0}%</b>\n",
+    "dailyDownChange": "Günlük Değişim: <b>↓ {0}%</b>\n",
     "weeklyUpChange": "Haftalık Değişim: <b>↑ +{0}%</b>\n",
-    "weeklyDownChange": "Haftalık Değişim: <b>↓ -{0}%</b>\n",
+    "weeklyDownChange": "Haftalık Değişim: <b>↓ {0}%</b>\n",
     "monthlyUpChange": "Aylık Değişim: <b>↑ +{0}%</b>",
-    "monthlyDownChange": "Aylık Değişim: <b>↓ -{0}%</b>"
+    "monthlyDownChange": "Aylık Değişim: <b>↓ {0}%</b>"
   },
   "buttonTimes": {
     "5min": "5 Dakika",
@@ -24,7 +23,7 @@
     "cancel": {
       "selectCurency": "Aboneliğinizi iptal etmek istediğiniz para birimini seçin.",
       "noSubscription": "Aboneliğiniz bulunmamaktadır!",
-      "callbackQuery": {
+      "callbackQueryLang": {
         "unSubscribe": "<b>{0}</b> aboneliğiniz iptal edildi."
       }
     },
@@ -40,42 +39,43 @@
       "button": {
         "manualCurrency": "Para birimini manuel olarak girin"
       },
-      "callbackQuery": {
-        "FOLLOWMANUAL": {
+      "callbackQueryLang": {
+        "followmanual": {
           "message": "Takip etmek istediğiniz para birimini girin.",
-          "inputPlaceholder": "Lütfen para birimi girin"
+          "placeholder": "Lütfen para birimi girin"
         },
-        "FOLLOW": {
-          "notificationFrequency": "<b>{0}</b>'den ne sıklıkla bildirim almak istiyorsunuz?"
+        "follow": {
+          "frequency": "<b>{0}</b>'den ne sıklıkla bildirim almak istiyorsunuz?"
         },
-        "TIME": {
-          "MINUTE": "Her {0} dakikada bir bildirim alacaksınız.\n\n",
-          "HOUR": "Her {0} saatte bir bildirim alacaksınız.\n\n",
-          "DAY": "Günde bir kez bildirim alacaksınız.\n\n"
+        "time": {
+          "minute": "Her {0} dakikada bir bildirim alacaksınız.\n\n",
+          "hour": "Her {0} saatte bir bildirim alacaksınız.\n\n",
+          "day": "Günde bir kez bildirim alacaksınız.\n\n"
         }
-      }
+      },
+      "errorMessage": "Geçersiz para birimi!"
     },
     "price": {
       "selectCurrency": "Fiyatını görmek istediğiniz para birimini seçin.",
       "button": {
         "manualCurrency": "Para birimini manuel olarak girin"
       },
-      "callbackQuery": {
-        "PRICEMANUAL": {
-          "selectCurrency": "Fiyatını görmek istediğiniz para birimini seçin.",
-          "inputPlaceholder": "Lütfen para birimi girin"
+      "callbackQueryLang": {
+        "pricemanual": {
+          "selectCurrency": "Fiyatını görmek istediğiniz para birimini girin.",
+          "placeholder": "Lütfen para birimi girin"
         }
       },
       "replyMessage": {
-        "PRICEMANUAL": {
-          "selectCurrency": "Fiyatını görmek istediğiniz para birimini seçin.",
-          "inputPlaceholder": "Lütfen para birimi girin"
+        "pricemanual": {
+          "selectCurrency": "Fiyatını görmek istediğiniz para birimini girin.",
+          "placeholder": "Lütfen para birimi girin"
         }
       },
       "errorMessage": "Geçersiz para birimi!"
     },
-    "subscriponts": {
-      "mySubscriptions": "📌 <b>Aboneliklerim</b> 📌",
+    "subscriptions": {
+      "mySubscriptions": "📌 <b>Aboneliklerim</b> 📌\n\n",
       "noSubscriptions": "Aboneliğiniz bulunmamaktadır!"
     }
   }
