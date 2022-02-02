@@ -4,21 +4,22 @@ const RabbitMQService = require("./services/RabbitMQService");
 const CurrencyService = require("./services/CurrencyService");
 
 async function getNotificationMessage(notifications) {
-  const currency = {};
+  const currencyObject = {};
 
   return notifications.map(async (notification) => {
-    const { currency: currencyName, chatId } = notification;
+    const { currency, chatId } = notification;
+    const [currencyType, currencyName] = currency.split("_");
 
-    if (!currency[currencyName]) {
-      const response = await CurrencyService.getPriceCrypto(currencyName);
+    if (!currencyObject[currencyName]) {
+      const response = await CurrencyService.getCurrencyPrice(
+        currencyType,
+        currencyName
+      );
 
-      currency[currencyName] = {
-        ...response,
-        price: response.lp ? response.lp : response.price,
-      };
+      currencyObject[currencyName] = response;
     }
 
-    const { price, cpd, cpw, cpm } = currency[currencyName];
+    const { price, cpd, cpw, cpm } = currencyObject[currencyName];
     let message = `
     ​
 <b>${currencyName}:</b> ${price}\n\n`;
@@ -43,10 +44,7 @@ async function getNotificationMessage(notifications) {
       }
     }
 
-    return {
-      chatId,
-      message,
-    };
+    return { chatId, message };
   });
 }
 
