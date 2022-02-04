@@ -1,7 +1,7 @@
 // Services
 const TelegramService = require("../services/TelegramService");
 
-TelegramService.onText(/^\/start$/g, (msg) => {
+TelegramService.onText(/^\/bilgi$/g, (msg) => {
   const userId = msg.from.id;
   const message = `
 Merhaba

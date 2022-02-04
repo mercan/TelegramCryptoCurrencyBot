@@ -1,146 +1,131 @@
 const cron = require("node-cron");
+
+// Services
 const NotificationService = require("./services/NotificationService");
 const RabbitMQService = require("./services/RabbitMQService");
 const CurrencyService = require("./services/CurrencyService");
 
+// Utils
+const formatCurrencyMessage = require("./utils/formatCurrencyMessage");
+
 async function getNotificationMessage(notifications) {
-  const currencyObject = {};
+  return notifications.map(async ({ userId, currencies }) => {
+    const currenciesObject = {};
 
-  return notifications.map(async (notification) => {
-    const { currency, chatId } = notification;
-    const [currencyType, currencyName] = currency.split("_");
+    const messages = await Promise.all(
+      currencies.map(async ({ type, symbol }) => {
+        if (!currenciesObject[symbol]) {
+          const response = await CurrencyService.getCurrencyPrice(type, symbol);
+          currenciesObject[symbol] = response;
+        }
 
-    if (!currencyObject[currencyName]) {
-      const response = await CurrencyService.getCurrencyPrice(
-        currencyType,
-        currencyName
-      );
+        const response = currenciesObject[symbol];
+        const message = formatCurrencyMessage(response);
 
-      currencyObject[currencyName] = response;
-    }
+        return message;
+      })
+    );
 
-    const { price, cpd, cpw, cpm } = currencyObject[currencyName];
-    let message = `
-    ​
-<b>${currencyName}:</b> ${price}\n\n`;
-
-    if (cpd) {
-      if (cpd >= 0) {
-        message += `Daily Change: <b>↑ +${cpd}%</b>\n`;
-      } else {
-        message += `Daily Change: <b>↓ ${cpd}%</b>\n`;
-      }
-
-      if (cpw >= 0) {
-        message += `Weekly Change: <b>↑ +${cpw}%</b>\n`;
-      } else {
-        message += `Weekly Change: <b>↓ ${cpw}%</b>\n`;
-      }
-
-      if (cpm >= 0) {
-        message += `Monthly Change: <b>↑ +${cpm}%</b>`;
-      } else {
-        message += `Monthly Change: <b>↓ ${cpm}%</b>`;
-      }
-    }
-
-    return { chatId, message };
+    return {
+      userId,
+      message: messages.reduce((acc, message) => (acc += message), ""),
+    };
   });
 }
 
 cron.schedule("0,5,10,15,20,25,30,35,40,45,50,55 * * * *", async () => {
-  const notifications = await NotificationService.get5MinuteNotifications();
+  const notifications = await NotificationService.getNotifications(5);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });
 });
 
 cron.schedule("0,10,20,30,40,50 * * * *", async () => {
-  const notifications = await NotificationService.get10MinuteNotifications();
+  const notifications = await NotificationService.getNotifications(10);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });
 });
 
 cron.schedule("0,30 * * * *", async () => {
-  const notifications = await NotificationService.get30MinuteNotifications();
+  const notifications = await NotificationService.getNotifications(30);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });
 });
 
 cron.schedule("0 * * * *", async () => {
-  const notifications = await NotificationService.get1HourNotifications();
+  const notifications = await NotificationService.getNotifications(60);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });
 });
 
 cron.schedule("0 0,6,12,18 * * *", async () => {
-  const notifications = await NotificationService.get6HourNotifications();
+  const notifications = await NotificationService.getNotifications(360);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });
 });
 
 cron.schedule("0 0,12 * * *", async () => {
-  const notifications = await NotificationService.get12HourNotifications();
+  const notifications = await NotificationService.getNotifications(720);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });
 });
 
 cron.schedule("0 0 * * *", async () => {
-  const notifications = await NotificationService.get1DayNotifications();
+  const notifications = await NotificationService.getNotifications(1440);
   const messages = await Promise.all(
     await getNotificationMessage(notifications)
   );
 
-  messages.forEach(({ chatId, message }) => {
+  messages.forEach(({ userId, message }) => {
     RabbitMQService.sendToQueue({
-      chatId,
+      userId,
       text: message,
     });
   });

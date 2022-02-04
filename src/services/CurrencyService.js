@@ -3,18 +3,20 @@ const fetch = require("node-fetch");
 const { FINAGE } = require("../config/index");
 
 class CurrencyService {
-  async getCurrencyPrice(currencyType, currency) {
-    if (currencyType === "CRYPTO") {
-      return await this.getCryptoCurrency(currency);
-    } else if (currencyType === "FOREX") {
-      return await this.getForexCurrency(currency);
+  getCurrencyPrice(type, symbol) {
+    if (type === "FOREX") {
+      return this.getForexCurrency(symbol);
+    }
+
+    if (type === "CRYPTO") {
+      return this.getCryptoCurrency(symbol);
     }
   }
 
-  async getCryptoCurrency(currency) {
+  async getCryptoCurrency(symbol) {
     try {
       const response = await fetch(
-        `https://api.finage.co.uk/last/crypto/changes/${currency}?apikey=${FINAGE.API_KEY}`,
+        `https://api.finage.co.uk/last/crypto/changes/${symbol}?apikey=${FINAGE.API_KEY}`,
         {
           method: "GET",
           headers: {
@@ -25,11 +27,12 @@ class CurrencyService {
 
       const data = await response.json();
       data.price = Number(data.lp.toFixed(4));
+      data.symbol = data.s;
 
       return data;
     } catch {
       const response = await fetch(
-        `https://api.finage.co.uk/last/crypto/${currency}?apikey=${FINAGE.API_KEY}`,
+        `https://api.finage.co.uk/last/crypto/${symbol}?apikey=${FINAGE.API_KEY}`,
         {
           method: "GET",
           headers: {
@@ -40,14 +43,15 @@ class CurrencyService {
 
       const data = await response.json();
       data.price = Number(data.price.toFixed(4));
+      data.symbol = data.s;
 
       return data;
     }
   }
 
-  async getForexCurrency(currency) {
+  async getForexCurrency(symbol) {
     const response = await fetch(
-      `https://api.finage.co.uk/last/forex/${currency}?apikey=${FINAGE.API_KEY}`,
+      `https://api.finage.co.uk/last/forex/${symbol}?apikey=${FINAGE.API_KEY}`,
       {
         method: "GET",
         headers: {

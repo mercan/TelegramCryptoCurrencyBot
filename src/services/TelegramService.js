@@ -6,26 +6,27 @@ class TelegramService {
     const config = { polling: true };
     this.config = config;
     this.token = BOT_TOKEN;
+
     this.bot = new Telegram(this.token, this.config);
     this.on("polling_error", console.error);
 
     this.bot.setMyCommands(setCommands);
   }
 
-  async sendMessage(chatId, message, options = {}) {
-    return await this.bot.sendMessage(chatId, message, options);
+  async sendMessage(userId, message, options = {}) {
+    return await this.bot.sendMessage(userId, message, options);
   }
 
-  async editMessageText(chatId, messageId, message, options = {}) {
+  async editMessageText(userId, messageId, message, options = {}) {
     return await this.bot.editMessageText(message, {
-      chat_id: chatId,
+      chat_id: userId,
       message_id: messageId,
       ...options,
     });
   }
 
-  async deleteMessage(chatId, messageId) {
-    return await this.bot.deleteMessage(chatId, messageId);
+  async deleteMessage(userId, messageId) {
+    return await this.bot.deleteMessage(userId, messageId);
   }
 
   async answerCallbackQuery(callbackQueryId, text) {
@@ -44,39 +45,40 @@ class TelegramService {
 const setCommands = [
   {
     command: "start",
-    description: "Start using bot",
+    description: "Detaylı bilgi verir.",
   },
   {
-    command: "follow",
+    command: "takip",
     description:
-      "You can start a new subscription with the command, or you can change the frequency of sending notifications of your existing subscription.",
+      "Komutu ile yeni bir abonelik başlatabilir veya mevcut aboneliğinizin bildirim gönderme sıklığını değiştirebilirsiniz.",
   },
   {
-    command: "price",
+    command: "sondurum",
     description:
-      "You can find out the last price of the currency unit you want with the command.",
+      "Komutu ile abone olduğunuz tüm döviz birimlerinin son durumlarını öğrenebilirsiniz.",
   },
-  // {
-  //   command: "listcurrency",
-  //   description: "Enter the currency you want to track.",
-  // },
   {
-    command: "subscriptions",
+    command: "fiyat",
     description:
-      "With the command, you can list all your subscriptions and see which channel you are on in the currency you subscribe to.",
+      "Komutu ile istediğiniz para biriminin son fiyatını öğrenebilirsiniz..",
   },
   {
-    command: "cancel",
+    command: "aboneliklerim",
     description:
-      "You can terminate your subscription to the currency of your choice with the command. The subscription can then be restarted.",
+      "Komutu ile tüm aboneliklerinizi listeleyebilir ve bildirim sıklığını görebilirsiniz.",
   },
   {
-    command: "cancelall",
-    description: "You can terminate all your subscriptions with the command.",
+    command: "iptal",
+    description:
+      "Komutu ile istediğiniz para birimine aboneliğinizi sonlandırabilirsiniz. Abonelik daha sonra yeniden başlatılabilir.",
   },
   {
-    command: "help",
-    description: "Help",
+    command: "tumiptal",
+    description: "Komutu ile tüm aboneliklerinizi sonlandırabilirsiniz.",
+  },
+  {
+    command: "bilgi",
+    description: "Detaylı bilgi verir.",
   },
 ];
 

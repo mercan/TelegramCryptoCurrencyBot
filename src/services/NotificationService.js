@@ -1,7 +1,5 @@
+// Model
 const notificationModel = require("../models/Notification");
-
-// Services
-const CurrencyService = require("./CurrencyService");
 
 class NotificationService {
   constructor() {
@@ -41,95 +39,119 @@ class NotificationService {
     }
   }
 
-  async deleteUser(chatId) {
-    await this.notificationModel.deleteMany({
-      chatId,
-    });
+  async deleteUser(userId) {
+    await this.notificationModel.deleteOne({ userId });
   }
 
-  async getSubscriber(chatId) {
-    const subscribers = await this.notificationModel.find({
-      chatId,
-    });
+  async getSubscriberedCurrencies(userId) {
+    const notificationRecord = await this.notificationModel.findOne(
+      {
+        userId,
+      },
+      "currencies"
+    );
 
-    return subscribers.map((subscriber) => {
-      return {
-        chatId: subscriber.chatId,
-        currency: subscriber.currency,
-        time: subscriber.time,
-        timeUnit: subscriber.timeUnit,
-      };
-    });
+    return notificationRecord.currencies;
   }
 
-  async cancelSubscriber(chatId, currency) {
-    await this.notificationModel.deleteOne({
-      chatId,
-      currency,
-    });
+  async cancelSubscriber(userId, type, symbol) {
+    return await this.notificationModel.updateOne(
+      {
+        userId,
+      },
+      {
+        $pull: {
+          currencies: {
+            type,
+            symbol,
+          },
+        },
+      }
+    );
   }
 
-  async get5MinuteNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 5,
-      timeUnit: "minute",
-    });
+  async createOrUpdateNotification(notification) {
+    const { userId, username, currencies } = notification;
+    const notificationRecord = await this.notificationModel.findOne({ userId });
 
-    return notifications;
+    if (notificationRecord) {
+      const checkCurrency = notificationRecord.currencies.filter(
+        ({ type, symbol, timeInMinutes }) => {
+          if (currencies[0].type === type && currencies[0].symbol === symbol) {
+            return {
+              type,
+              symbol,
+              timeInMinutes,
+            };
+          }
+        }
+      );
+
+      if (checkCurrency.length) {
+        return this.notificationModel.updateOne(
+          {
+            userId,
+            currencies: {
+              $elemMatch: {
+                type: checkCurrency[0].type,
+                symbol: checkCurrency[0].symbol,
+              },
+            },
+          },
+          {
+            "currencies.$.timeInMinutes": currencies[0].timeInMinutes,
+          }
+        );
+      }
+
+      return this.notificationModel.updateOne(
+        {
+          userId,
+        },
+        {
+          $push: {
+            currencies,
+          },
+        }
+      );
+    }
+
+    const newNotification = {
+      userId,
+      username,
+      currencies,
+    };
+
+    return this.notificationModel.create(newNotification);
   }
 
-  async get10MinuteNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 10,
-      timeUnit: "minute",
-    });
-
-    return notifications;
-  }
-
-  async get30MinuteNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 30,
-      timeUnit: "minute",
-    });
-
-    return notifications;
-  }
-
-  async get1HourNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 1,
-      timeUnit: "hour",
-    });
-
-    return notifications;
-  }
-
-  async get6HourNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 6,
-      timeUnit: "hour",
-    });
-
-    return notifications;
-  }
-
-  async get12HourNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 12,
-      timeUnit: "hour",
-    });
-
-    return notifications;
-  }
-
-  async get1DayNotifications() {
-    const notifications = await this.notificationModel.find({
-      time: 1,
-      timeUnit: "day",
-    });
-
-    return notifications;
+  async getNotifications(timeInMinutes) {
+    return await this.notificationModel.aggregate([
+      {
+        $match: {
+          currencies: {
+            $elemMatch: {
+              timeInMinutes,
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: 1,
+          currencies: {
+            $filter: {
+              input: "$currencies",
+              as: "currency",
+              cond: {
+                $eq: ["$$currency.timeInMinutes", timeInMinutes],
+              },
+            },
+          },
+        },
+      },
+    ]);
   }
 }
 

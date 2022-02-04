@@ -22,29 +22,34 @@ class RabbitMQService {
 
     this.channel.consume(this.queueName, async (msg) => {
       const message = JSON.parse(msg.content.toString());
-      const chatId = message.chatId;
+      const userId = message.userId;
       const messageText = message.text;
 
       try {
-        await TelegramService.sendMessage(chatId, messageText, {
+        await TelegramService.sendMessage(userId, messageText, {
           parse_mode: "HTML",
         });
 
         console.log(
-          `LOG: Message sent to ${chatId} successfully with text: ${messageText
+          `LOG: Message sent to ${userId} successfully with text: ${messageText
             .trim()
             .replace(/\n/g, "")} - ${Date.now()}`
         );
         this.channel.ack(msg);
       } catch (error) {
-        console.error("Send Message Error:", {
-          error_code: error.response.body.error_code,
-          description: error.response.body.description,
-          timestamp: Date.now(),
-        });
+        console.error(
+          "Send Message Error:",
+          {
+            error_code: error.response.body.error_code,
+            description: error.response.body.description,
+            timestamp: Date.now(),
+          },
+          "Message:",
+          message
+        );
 
         if (error.response.body.error_code === 403) {
-          await NotificationService.deleteUser(chatId);
+          await NotificationService.deleteUser(userId);
           this.channel.ack(msg);
         } else if (error.response.body.error_code === 429) {
           this.channel.nack(msg);

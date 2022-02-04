@@ -1,31 +1,39 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { Schema, model } = require("mongoose");
 
+// Create the model class
 const Notification = new Schema(
   {
+    userId: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+
     username: {
       type: String,
     },
 
-    chatId: {
-      type: Number,
-      required: true,
-    },
+    currencies: [
+      {
+        _id: false,
 
-    currency: {
-      type: String,
-      required: true,
-    },
+        symbol: {
+          type: String,
+          required: true,
+        },
 
-    time: {
-      type: Number,
-      required: true,
-    },
+        type: {
+          type: String,
+          required: true,
+          enum: ["FOREX", "CRYPTO"],
+        },
 
-    timeUnit: {
-      type: String,
-      required: true,
-    },
+        timeInMinutes: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -33,4 +41,5 @@ const Notification = new Schema(
   }
 );
 
-module.exports = mongoose.model("Notification", Notification);
+// Export the model
+module.exports = model("Notification", Notification);
