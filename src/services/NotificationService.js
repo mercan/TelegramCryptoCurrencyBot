@@ -98,7 +98,7 @@ class NotificationService {
       "currencies"
     );
 
-    return notificationRecord.currencies;
+    return notificationRecord ? notificationRecord.currencies : [];
   }
 
   async cancelSubscriber(userId, type, symbol) {
@@ -120,8 +120,6 @@ class NotificationService {
   async deleteUser(userId) {
     await this.notificationModel.deleteOne({ userId });
   }
-
-
 }
 
 module.exports = new NotificationService();
