@@ -4,12 +4,12 @@ module.exports = {
   FINAGE: {
     API_KEY: process.env.FINAGE_API_KEY,
   },
-  MONGODB: {
-    URI: process.env.MONGODB_URI,
-  },
   TELEGRAM: {
     BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
     BOT_USERNAME: process.env.TELEGRAM_BOT_USERNAME,
+  },
+  MONGODB: {
+    URI: process.env.MONGODB_URI,
   },
   RABBITMQ: {
     HOST: process.env.RABBITMQ_HOST,

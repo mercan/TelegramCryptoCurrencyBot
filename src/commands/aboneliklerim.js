@@ -23,7 +23,7 @@ TelegramService.onText(/^\/aboneliklerim$/g, async (msg) => {
         acc = "📌 <b>Aboneliklerim</b> 📌\n\n";
       }
 
-      if (timeInMinutes >= 5 && timeInMinutes <= 30) {
+      if (timeInMinutes <= 30) {
         timeType = "Dakika";
         timeUnit = timeInMinutes;
       } else if (timeInMinutes >= 60 && timeInMinutes <= 720) {
@@ -41,5 +41,5 @@ TelegramService.onText(/^\/aboneliklerim$/g, async (msg) => {
     ""
   );
 
-  TelegramService.sendMessage(userId, message, { parse_mode: "HTML" });
+  await TelegramService.sendMessage(userId, message, { parse_mode: "HTML" });
 });

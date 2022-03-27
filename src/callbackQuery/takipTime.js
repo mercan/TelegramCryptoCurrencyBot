@@ -17,7 +17,7 @@ TelegramService.on("callback_query", async (callbackQuery) => {
     const [type, symbol] = currency.split("/");
     let message;
 
-    if (timeInMinutes >= 5 && timeInMinutes <= 30) {
+    if (timeInMinutes <= 30) {
       message = `Her ${timeInMinutes} dakikada bir bildirim alacaksınız.\n\n`;
     } else if (timeInMinutes >= 60 && timeInMinutes <= 720) {
       message = `Her ${
@@ -46,6 +46,6 @@ TelegramService.on("callback_query", async (callbackQuery) => {
       ],
     };
 
-    NotificationService.createOrUpdateNotification(newNotification);
+    await NotificationService.createOrUpdateNotification(newNotification);
   }
 });

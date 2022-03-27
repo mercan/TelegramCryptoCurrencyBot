@@ -32,10 +32,6 @@ TelegramService.on("callback_query", async (callbackQuery) => {
         inline_keyboard: [
           [
             {
-              text: "5 Dakika",
-              callback_data: `TIME_${currency}_5`,
-            },
-            {
               text: "10 Dakika",
               callback_data: `TIME_${currency}_10`,
             },
