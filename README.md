@@ -20,12 +20,6 @@ Proje dizinine gidin
   cd TelegramCryptoCurrencyBot
 ```
 
-Gerekli paketleri yükleyin
-
-```bash
-  npm install
-```
-
 Docker build alın ve çalıştırın\
 Bilgisayarınızda docker yoksa buradan indirebilirsiniz [Docker İndir](https://docs.docker.com/get-docker/)
 
