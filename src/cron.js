@@ -33,20 +33,6 @@ async function getNotificationMessage(notifications) {
   });
 }
 
-cron.schedule("0,5,10,15,20,25,30,35,40,45,50,55 * * * *", async () => {
-  const notifications = await NotificationService.getNotifications(5);
-  const messages = await Promise.all(
-    await getNotificationMessage(notifications)
-  );
-
-  messages.forEach(({ userId, message }) => {
-    RabbitMQService.sendToQueue({
-      userId,
-      text: message,
-    });
-  });
-});
-
 cron.schedule("0,10,20,30,40,50 * * * *", async () => {
   const notifications = await NotificationService.getNotifications(10);
   const messages = await Promise.all(
