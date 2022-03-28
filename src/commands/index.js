@@ -1,9 +1,9 @@
 require("./start");
-require("./takip");
-require("./fiyat");
-require("./iptal");
-require("./tumiptal");
-require("./sondurum");
-require("./aboneliklerim");
-require("./bilgi");
+require("./follow");
+require("./price");
+require("./cancel");
+require("./cancelAll");
+require("./latestStatus");
+require("./subscribers");
+require("./help");
 require("../callbackQuery/index");

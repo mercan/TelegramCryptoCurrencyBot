@@ -1,9 +1,9 @@
-// Takip
-require("./takipFollow");
-require("./takipTime");
-require("./takipReplyMessage");
-// İptal
-require("./iptal");
-// Fiyat
-require("./fiyat");
-require("./fiyatReplyMessage");
+// Follow
+require("./follow");
+require("./followTime");
+require("./followReplyMessage");
+// Cancel
+require("./cancel");
+// Price
+require("./price");
+require("./priceReplyMessage");
