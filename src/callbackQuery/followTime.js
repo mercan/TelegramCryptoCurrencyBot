@@ -10,8 +10,7 @@ const formatCurrencyMessage = require("../utils/formatCurrencyMessage");
 TelegramService.on("callback_query", async (callbackQuery) => {
   const messageId = callbackQuery.message.message_id;
   const userId = callbackQuery.from.id;
-  const { data } = callbackQuery;
-  const [command, currency, timeInMinutes] = data.split("_");
+  const [command, currency, timeInMinutes] = callbackQuery.data.split("_");
 
   if (command === "TIME") {
     const [type, symbol] = currency.split("/");

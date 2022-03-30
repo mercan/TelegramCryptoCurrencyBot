@@ -21,14 +21,16 @@ TelegramService.on("message", async (msg) => {
     // Forex Currency
     const filterForex = forexCurrency.flatMap((forex) => {
       if (
-        selectedCurrency + "USD" === forex ||
-        selectedCurrency + "EUR" === forex ||
-        selectedCurrency + "TRY" === forex ||
-        selectedCurrency + "GBP" === forex ||
-        selectedCurrency + "RUB" === forex ||
-        selectedCurrency + "AUD" === forex ||
-        selectedCurrency + "JPY" === forex ||
-        selectedCurrency + "CNY" === forex
+          selectedCurrency + "BTC" === forex ||
+          selectedCurrency + "ETH" === forex ||
+          selectedCurrency + "USD" === forex ||
+          selectedCurrency + "EUR" === forex ||
+          selectedCurrency + "TRY" === forex ||
+          selectedCurrency + "GBP" === forex ||
+          selectedCurrency + "RUB" === forex ||
+          selectedCurrency + "AUD" === forex ||
+          selectedCurrency + "JPY" === forex ||
+          selectedCurrency + "CNY" === forex
       ) {
         return {
           text:
@@ -60,13 +62,15 @@ TelegramService.on("message", async (msg) => {
     // Crypto Currency
     const filterCrypto = cryptoCurrency.flatMap((crypto) => {
       if (
-        selectedCurrency + "USD" === crypto ||
-        selectedCurrency + "BUSD" === crypto ||
-        selectedCurrency + "EUR" === crypto ||
-        selectedCurrency + "TRY" === crypto ||
-        selectedCurrency + "GBP" === crypto ||
-        selectedCurrency + "RUB" === crypto ||
-        selectedCurrency + "AUD" === crypto
+          selectedCurrency + "BTC" === crypto ||
+          selectedCurrency + "ETH" === crypto ||
+          selectedCurrency + "USD" === crypto ||
+          selectedCurrency + "BUSD" === crypto ||
+          selectedCurrency + "EUR" === crypto ||
+          selectedCurrency + "TRY" === crypto ||
+          selectedCurrency + "GBP" === crypto ||
+          selectedCurrency + "RUB" === crypto ||
+          selectedCurrency + "AUD" === crypto
       ) {
         return {
           text:

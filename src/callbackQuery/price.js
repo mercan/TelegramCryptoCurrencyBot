@@ -8,8 +8,7 @@ const formatCurrencyMessage = require("../utils/formatCurrencyMessage");
 TelegramService.on("callback_query", async (callbackQuery) => {
   const messageId = callbackQuery.message.message_id;
   const userId = callbackQuery.from.id;
-  const { data } = callbackQuery;
-  const [command, currency] = data.split("_");
+  const [command, currency] = callbackQuery.data.split("_");
 
   if (command === "PRICEMANUAL") {
     await TelegramService.deleteMessage(userId, messageId);
