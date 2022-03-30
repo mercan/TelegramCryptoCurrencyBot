@@ -29,7 +29,7 @@ TelegramService.onText(/^\/fiyat$/g, async (msg) => {
       },
     ]);
 
-    TelegramService.sendMessage(userId, message, {
+    await TelegramService.sendMessage(userId, message, {
       reply_markup: {
         inline_keyboard,
       },

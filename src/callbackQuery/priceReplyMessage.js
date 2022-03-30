@@ -21,8 +21,6 @@ TelegramService.on("message", async (msg) => {
     // Forex Currency
     const filterForex = forexCurrency.flatMap((forex) => {
       if (
-          selectedCurrency + "BTC" === forex ||
-          selectedCurrency + "ETH" === forex ||
           selectedCurrency + "USD" === forex ||
           selectedCurrency + "EUR" === forex ||
           selectedCurrency + "TRY" === forex ||
@@ -61,17 +59,15 @@ TelegramService.on("message", async (msg) => {
       if (
           selectedCurrency + "BTC" === crypto ||
           selectedCurrency + "ETH" === crypto ||
+          selectedCurrency + "BNB" === crypto ||
           selectedCurrency + "USD" === crypto ||
           selectedCurrency + "BUSD" === crypto ||
           selectedCurrency + "EUR" === crypto ||
-          selectedCurrency + "TRY" === crypto ||
-          selectedCurrency + "GBP" === crypto ||
-          selectedCurrency + "RUB" === crypto ||
-          selectedCurrency + "AUD" === crypto
+          selectedCurrency + "TRY" === crypto
       ) {
         return {
           text:
-            crypto.slice(0, selectedCurrency.length) +
+            selectedCurrency +
             " • " +
             crypto.slice(selectedCurrency.length, crypto.length),
           callback_data: `PRICE_CRYPTO/${crypto}`,
