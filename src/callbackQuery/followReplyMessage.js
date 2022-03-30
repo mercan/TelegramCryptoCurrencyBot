@@ -16,7 +16,7 @@ TelegramService.on("message", async (msg) => {
       "Lütfen takip etmek istediğiniz para birimini giriniz."
   ) {
     const messageId = replyMessage.message_id;
-    const selectedCurrency = msg.text;
+    const selectedCurrency = msg.text.toUpperCase();
 
     // Forex Currency
     const filterForex = forexCurrency.flatMap((forex) => {

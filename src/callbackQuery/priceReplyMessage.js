@@ -14,7 +14,7 @@ TelegramService.on("message", async (msg) => {
     replyMessage &&
     replyMessage.text === "Fiyatını görmek istediğiniz para birimini giriniz."
   ) {
-    const selectedCurrency = msg.text;
+    const selectedCurrency = msg.text.toUpperCase();
     // Delete Reply Message
     await TelegramService.deleteMessage(userId, replyMessage.message_id);
 
