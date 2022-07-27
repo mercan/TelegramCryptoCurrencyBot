@@ -12,4 +12,4 @@ Telegram'da belirlediğiniz dakika, saat ve gün aralığında size istediğiniz
 
 ## Sponsor
 
-- [Finage](https://finage.co.uk/) finansal veriler için.
+[Finage](https://finage.co.uk/) finansal veriler için.
