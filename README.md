@@ -8,7 +8,7 @@ Telegram'da belirlediğiniz dakika, saat ve gün aralığında size istediğiniz
 
 ## Kullanılan Teknolojiler
 
-**Sunucu:** Docker, NodeJS, MongoDB, RabbitMQ
+Docker, NodeJS, MongoDB, RabbitMQ
 
 ## Sponsor
 
